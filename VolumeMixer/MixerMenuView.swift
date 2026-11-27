@@ -69,7 +69,7 @@ struct MixerMenuView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Volume Mixer").font(.headline)
+            Text("Sound").font(.headline)
             HStack(spacing: 8) {
                 Button { controller.toggleSystemMute() } label: {
                     Image(systemName: controller.systemMuted ? "speaker.slash.fill" : "speaker.fill")
