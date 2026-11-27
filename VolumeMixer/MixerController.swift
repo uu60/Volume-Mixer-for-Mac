@@ -158,7 +158,7 @@ final class MixerController: ObservableObject {
             let newDevices = try CoreAudioSystem.outputDevices()
             let defaultID = try CoreAudioSystem.defaultOutputDeviceID()
             let deviceChanged = selectedDeviceID != kAudioObjectUnknown && selectedDeviceID != defaultID
-            devices = newDevices
+            if devices != newDevices { devices = newDevices }
             selectedDeviceID = defaultID
             let hasNativeVolume = CoreAudioSystem.canSetOutputVolume(defaultID)
             usesSoftwareOutputVolume = !hasNativeVolume && newDevices.contains { $0.id == defaultID }

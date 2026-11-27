@@ -100,7 +100,7 @@ struct MixerMenuView: View {
                         Button { controller.chooseDevice(device.id) } label: {
                             HStack(spacing: 8) {
                                 Group {
-                                    if let url = device.iconURL, let icon = NSImage(contentsOf: url) {
+                                    if let url = device.iconURL, let icon = DeviceIconCache.image(for: url) {
                                         Image(nsImage: icon)
                                             .resizable()
                                             .scaledToFit()
@@ -234,5 +234,19 @@ private struct RefreshButtonStyle: ButtonStyle {
                     .fill(configuration.isPressed ? Color.primary.opacity(0.18)
                           : (isHovered ? Color.primary.opacity(0.10) : .clear))
             )
+    }
+}
+
+/// Device icons come from image files; loading them in `body` re-decoded them on every
+/// re-render (e.g. each volume change), which made them flicker. Load each file once.
+@MainActor
+private enum DeviceIconCache {
+    private static var images: [URL: NSImage] = [:]
+
+    static func image(for url: URL) -> NSImage? {
+        if let cached = images[url] { return cached }
+        guard let image = NSImage(contentsOf: url) else { return nil }
+        images[url] = image
+        return image
     }
 }
