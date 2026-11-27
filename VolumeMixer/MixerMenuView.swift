@@ -60,6 +60,8 @@ struct MixerMenuView: View {
         }
         .frame(width: 290, height: Self.panelHeight(deviceCount: controller.devices.count))
         .clipShape(RoundedRectangle(cornerRadius: 14))
+        // The popover never becomes key (so it doesn't steal focus); render controls as if it were.
+        .environment(\.controlActiveState, .key)
         .alert("Volume Mixer", isPresented: errorIsPresented) {
             Button("OK", role: .cancel) { controller.errorMessage = nil }
         } message: {
@@ -78,8 +80,11 @@ struct MixerMenuView: View {
                 .buttonStyle(.plain)
                 .allowsHitTesting(controller.canAdjustSystemVolume)
                 .help(controller.systemMuted ? "Unmute output" : "Mute output")
-                NativeOutputSlider(value: systemVolumeBinding,
-                                   isEnabled: controller.canAdjustSystemVolume)
+                Slider(value: systemVolumeBinding, in: 0...1) { editing in
+                    if !editing { controller.playVolumeFeedback() }
+                }
+                    .tint(.accentColor)
+                    .disabled(!controller.canAdjustSystemVolume)
                     .frame(height: 20)
                 Image(systemName: "speaker.wave.3.fill")
                     .foregroundStyle(controller.canAdjustSystemVolume ? Color.primary : Color.secondary.opacity(0.5))
@@ -174,7 +179,10 @@ struct MixerMenuView: View {
                         .frame(width: 38, alignment: .trailing)
                 }
                 .offset(y: 2)
-                Slider(value: volumeBinding(for: process), in: 0...1)
+                Slider(value: volumeBinding(for: process), in: 0...1) { editing in
+                    if !editing { controller.playVolumeFeedback(volume: controller.volume(for: process)) }
+                }
+                    .tint(.accentColor)
             }
 
             Button {
@@ -228,39 +236,5 @@ private struct RefreshButtonStyle: ButtonStyle {
                     .fill(configuration.isPressed ? Color.primary.opacity(0.18)
                           : (isHovered ? Color.primary.opacity(0.10) : .clear))
             )
-    }
-}
-
-private struct NativeOutputSlider: NSViewRepresentable {
-    @Binding var value: Double
-    let isEnabled: Bool
-
-    func makeCoordinator() -> Coordinator { Coordinator(value: $value) }
-
-    func makeNSView(context: Context) -> NSSlider {
-        let slider = NSSlider(value: value, minValue: 0, maxValue: 1,
-                              target: context.coordinator,
-                              action: #selector(Coordinator.valueChanged(_:)))
-        slider.isEnabled = isEnabled
-        slider.controlSize = .regular
-        return slider
-    }
-
-    func updateNSView(_ slider: NSSlider, context: Context) {
-        context.coordinator.value = $value
-        slider.isEnabled = isEnabled
-        if abs(slider.doubleValue - value) > 0.0001 {
-            slider.doubleValue = value
-        }
-    }
-
-    final class Coordinator: NSObject {
-        var value: Binding<Double>
-
-        init(value: Binding<Double>) { self.value = value }
-
-        @objc func valueChanged(_ slider: NSSlider) {
-            value.wrappedValue = slider.doubleValue
-        }
     }
 }

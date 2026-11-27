@@ -29,6 +29,9 @@ final class MixerController: ObservableObject {
     private let softwareVolumesKey = "softwareOutputVolumes"
     private let softwareMutesKey = "softwareOutputMutes"
     private let propertyQueue = DispatchQueue.main
+    private var volumeFeedbackSound: NSSound?
+    private static let volumeFeedbackPath =
+        "/System/Library/LoginPlugins/BezelServices.loginPlugin/Contents/Resources/volume.aiff"
     private var defaultOutputListener: AudioObjectPropertyListenerBlock?
     private var outputPropertyListener: AudioObjectPropertyListenerBlock?
     private var observedOutputDevice = AudioObjectID(kAudioObjectUnknown)
@@ -117,6 +120,24 @@ final class MixerController: ObservableObject {
                 systemMuted = false
             }
         } catch { show(error) }
+    }
+
+    /// Plays the same feedback sound macOS uses for volume keys, honoring
+    /// System Settings › Sound › "Play feedback when volume is changed".
+    func playVolumeFeedback(volume: Double = 1) {
+        // Standard defaults include the global domain, where this setting lives.
+        let enabled = defaults.object(forKey: "com.apple.sound.beep.feedback") as? Int ?? 1
+        guard enabled != 0, volume > 0.0001 else { return }
+        if volumeFeedbackSound == nil {
+            volumeFeedbackSound = NSSound(contentsOfFile: Self.volumeFeedbackPath, byReference: true)
+        }
+        guard let sound = volumeFeedbackSound else { return }
+        // Our own process is never tapped, so apply the software output level here.
+        let level = volume * (usesSoftwareOutputVolume ? (systemMuted ? 0 : systemVolume) : 1)
+        guard level > 0.0001 else { return }
+        sound.stop()
+        sound.volume = Float(min(max(level, 0), 1))
+        sound.play()
     }
 
     func toggleSystemMute() {

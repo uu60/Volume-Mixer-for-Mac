@@ -64,6 +64,7 @@ enum CoreAudioSystem {
 
     @MainActor static func processes(objectIDs ids: [AudioObjectID]) throws -> [AudioProcess] {
         let ownPID = ProcessInfo.processInfo.processIdentifier
+        let ownBundleID = Bundle.main.bundleIdentifier
 
         let audioObjects: [(id: AudioObjectID, pid: pid_t, bundleID: String, name: String, icon: NSImage?)] = ids.compactMap { objectID in
             guard let rawPID = try? uint32Property(
@@ -82,6 +83,9 @@ enum CoreAudioSystem {
                 object: objectID,
                 selector: kAudioProcessPropertyBundleID
             )) ?? running?.bundleIdentifier ?? ""
+            // Skip other Volume Mixer instances too (e.g. an installed copy plus an Xcode build);
+            // otherwise each one taps the other's feedback sound and its tap IO shows up as an app.
+            if let ownBundleID, bundleID == ownBundleID { return nil }
             let owner = owningApp(for: pid, running: running)
             return (objectID, pid, owner?.bundleID ?? bundleID,
                     owner?.name ?? running?.localizedName ?? (bundleID.isEmpty ? "Process \(pid)" : bundleID),
