@@ -1,5 +1,6 @@
 import AppKit
 import AudioToolbox
+import AVFoundation
 import Combine
 import CoreAudio
 import Foundation
@@ -29,9 +30,7 @@ final class MixerController: ObservableObject {
     private let softwareVolumesKey = "softwareOutputVolumes"
     private let softwareMutesKey = "softwareOutputMutes"
     private let propertyQueue = DispatchQueue.main
-    private var volumeFeedbackSound: NSSound?
-    private static let volumeFeedbackPath =
-        "/System/Library/LoginPlugins/BezelServices.loginPlugin/Contents/Resources/volume.aiff"
+    private let volumeFeedback = VolumeFeedbackPlayer()
     private var defaultOutputListener: AudioObjectPropertyListenerBlock?
     private var outputPropertyListener: AudioObjectPropertyListenerBlock?
     private var observedOutputDevice = AudioObjectID(kAudioObjectUnknown)
@@ -128,16 +127,10 @@ final class MixerController: ObservableObject {
         // Standard defaults include the global domain, where this setting lives.
         let enabled = defaults.object(forKey: "com.apple.sound.beep.feedback") as? Int ?? 1
         guard enabled != 0, volume > 0.0001 else { return }
-        if volumeFeedbackSound == nil {
-            volumeFeedbackSound = NSSound(contentsOfFile: Self.volumeFeedbackPath, byReference: true)
-        }
-        guard let sound = volumeFeedbackSound else { return }
         // Our own process is never tapped, so apply the software output level here.
         let level = volume * (usesSoftwareOutputVolume ? (systemMuted ? 0 : systemVolume) : 1)
         guard level > 0.0001 else { return }
-        sound.stop()
-        sound.volume = Float(min(max(level, 0), 1))
-        sound.play()
+        volumeFeedback.play(volume: Float(min(max(level, 0), 1)))
     }
 
     func toggleSystemMute() {
@@ -373,4 +366,36 @@ final class MixerController: ObservableObject {
         }
     }
 
+}
+
+/// Plays the macOS volume feedback sound off the main thread. The first playback
+/// initializes the audio output (~200 ms), which would otherwise freeze the UI,
+/// so the player is loaded and prepared in the background at launch.
+private final class VolumeFeedbackPlayer: @unchecked Sendable {
+    private static let url = URL(fileURLWithPath:
+        "/System/Library/LoginPlugins/BezelServices.loginPlugin/Contents/Resources/volume.aiff")
+    private let queue = DispatchQueue(label: "VolumeMixer.feedback", qos: .userInitiated)
+    private var player: AVAudioPlayer?
+
+    init() {
+        queue.async { [self] in _ = preparedPlayer() }
+    }
+
+    func play(volume: Float) {
+        queue.async { [self] in
+            guard let player = preparedPlayer() else { return }
+            player.stop()
+            player.currentTime = 0
+            player.volume = volume
+            player.play()
+        }
+    }
+
+    private func preparedPlayer() -> AVAudioPlayer? {
+        if player == nil {
+            player = try? AVAudioPlayer(contentsOf: Self.url)
+            player?.prepareToPlay()
+        }
+        return player
+    }
 }
