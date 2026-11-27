@@ -60,7 +60,7 @@ struct MixerMenuView: View {
         }
         .frame(width: 290, height: Self.panelHeight(deviceCount: controller.devices.count))
         .clipShape(RoundedRectangle(cornerRadius: 14))
-        .alert("Sound", isPresented: errorIsPresented) {
+        .alert("Volume Mixer", isPresented: errorIsPresented) {
             Button("OK", role: .cancel) { controller.errorMessage = nil }
         } message: {
             Text(controller.errorMessage ?? "Unknown error")
@@ -69,7 +69,7 @@ struct MixerMenuView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Sound").font(.headline)
+            Text("Volume Mixer").font(.headline)
             HStack(spacing: 8) {
                 Button { controller.toggleSystemMute() } label: {
                     Image(systemName: controller.systemMuted ? "speaker.slash.fill" : "speaker.fill")

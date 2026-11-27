@@ -40,7 +40,7 @@ final class StatusBarDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegat
             statusIconView.imageScaling = .scaleProportionallyDown
             statusIconView.imageAlignment = .alignCenter
             button.addSubview(statusIconView)
-            button.toolTip = "Sound"
+            button.toolTip = "Volume Mixer"
             button.target = self
             button.action = #selector(statusItemClicked)
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
@@ -88,7 +88,7 @@ final class StatusBarDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegat
 
     private func applyStatusIcon(_ symbol: String) {
         guard displayedSymbol != symbol else { return }
-        let image = NSImage(systemSymbolName: symbol, accessibilityDescription: "Sound")?
+        let image = NSImage(systemSymbolName: symbol, accessibilityDescription: "Volume Mixer")?
             .withSymbolConfiguration(.init(pointSize: 15, weight: .regular))
         image?.isTemplate = true
         statusIconView.image = image

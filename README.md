@@ -1,4 +1,4 @@
-# Sound
+# Volume Mixer
 
 A native macOS 14.2+ menu bar app that controls each audio-producing process without installing an audio driver.
 
@@ -41,7 +41,7 @@ xcodebuild \
   build
 ```
 
-The `AppIcon` asset catalog is included in the target, so Xcode adds the icon to packaged `Sound.app` automatically. To regenerate its sizes from the system speaker symbol, run `swift Tools/GenerateAppIcon.swift VolumeMixer/Assets.xcassets/AppIcon.appiconset` from this directory.
+The `AppIcon` asset catalog is included in the target, so Xcode adds the icon to packaged `Volume Mixer.app` automatically. To regenerate its sizes from the system speaker symbol, run `swift Tools/GenerateAppIcon.swift VolumeMixer/Assets.xcassets/AppIcon.appiconset` from this directory.
 
 ## Notes and limitations
 

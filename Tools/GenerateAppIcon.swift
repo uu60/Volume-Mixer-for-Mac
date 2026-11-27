@@ -32,7 +32,7 @@ func render(size: Int) throws -> Data {
 
     let configuration = NSImage.SymbolConfiguration(pointSize: 500, weight: .medium)
         .applying(.init(paletteColors: [.white]))
-    guard let symbol = NSImage(systemSymbolName: "speaker.wave.2.fill", accessibilityDescription: "Sound")?
+    guard let symbol = NSImage(systemSymbolName: "speaker.wave.2.fill", accessibilityDescription: "Volume Mixer")?
         .withSymbolConfiguration(configuration) else {
         NSGraphicsContext.restoreGraphicsState()
         throw NSError(domain: "SoundIcon", code: 2)

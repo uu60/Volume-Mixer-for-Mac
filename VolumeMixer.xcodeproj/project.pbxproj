@@ -1,7 +1,8 @@
 // !$*UTF8*$!
 {
 	archiveVersion = 1;
-	classes = {};
+	classes = {
+	};
 	objectVersion = 56;
 	objects = {
 
@@ -29,7 +30,7 @@
 		B10000000000000000000009 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		B1000000000000000000000A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		B1000000000000000000000B /* VolumeMixer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "VolumeMixer-Bridging-Header.h"; sourceTree = "<group>"; };
-		B1000000000000000000000C /* VolumeMixer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VolumeMixer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B1000000000000000000000C /* Volume Mixer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Volume Mixer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1000000000000000000000D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -91,7 +92,9 @@
 		};
 		D10000000000000000000005 /* Products */ = {
 			isa = PBXGroup;
-			children = (B1000000000000000000000C /* VolumeMixer.app */,);
+			children = (
+				B1000000000000000000000C /* Volume Mixer.app */,
+			);
 			name = Products;
 			sourceTree = "<group>";
 		};
@@ -106,11 +109,13 @@
 				C10000000000000000000001 /* Frameworks */,
 				C10000000000000000000003 /* Resources */,
 			);
-			buildRules = ();
-			dependencies = ();
+			buildRules = (
+			);
+			dependencies = (
+			);
 			name = VolumeMixer;
 			productName = VolumeMixer;
-			productReference = B1000000000000000000000C /* VolumeMixer.app */;
+			productReference = B1000000000000000000000C /* Volume Mixer.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -122,23 +127,39 @@
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2720;
 				LastUpgradeCheck = 2720;
-				TargetAttributes = { E10000000000000000000001 = { CreatedOnToolsVersion = 27.2; }; };
+				TargetAttributes = {
+					E10000000000000000000001 = {
+						CreatedOnToolsVersion = 27.2;
+					};
+				};
 			};
 			buildConfigurationList = F10000000000000000000001 /* Build configuration list for PBXProject "VolumeMixer" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
-			knownRegions = (en, Base);
+			knownRegions = (
+				en,
+				Base,
+			);
 			mainGroup = D10000000000000000000001;
 			productRefGroup = D10000000000000000000005 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
-			targets = (E10000000000000000000001 /* VolumeMixer */,);
+			targets = (
+				E10000000000000000000001 /* VolumeMixer */,
+			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		C10000000000000000000003 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A10000000000000000000009 /* Assets.xcassets in Resources */,); runOnlyForDeploymentPostprocessing = 0; };
+		C10000000000000000000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000009 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -171,7 +192,10 @@
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = ("DEBUG=1", "$(inherited)");
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 14.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				ONLY_ACTIVE_ARCH = YES;
@@ -202,18 +226,23 @@
 		F10000000000000000000005 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = 58TVC9MXHV;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = VolumeMixer/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks");
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 14.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.VolumeMixer;
-				PRODUCT_NAME = Sound;
+				PRODUCT_BUNDLE_IDENTIFIER = com.uu60.VolumeMixer;
+				PRODUCT_NAME = "Volume Mixer";
 				SWIFT_OBJC_BRIDGING_HEADER = "VolumeMixer/VolumeMixer-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
@@ -222,18 +251,23 @@
 		F10000000000000000000006 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = 58TVC9MXHV;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = VolumeMixer/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks");
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 14.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.VolumeMixer;
-				PRODUCT_NAME = Sound;
+				PRODUCT_BUNDLE_IDENTIFIER = com.uu60.VolumeMixer;
+				PRODUCT_NAME = "Volume Mixer";
 				SWIFT_OBJC_BRIDGING_HEADER = "VolumeMixer/VolumeMixer-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
@@ -244,13 +278,19 @@
 /* Begin XCConfigurationList section */
 		F10000000000000000000001 /* Build configuration list for PBXProject "VolumeMixer" */ = {
 			isa = XCConfigurationList;
-			buildConfigurations = (F10000000000000000000003 /* Debug */, F10000000000000000000004 /* Release */);
+			buildConfigurations = (
+				F10000000000000000000003 /* Debug */,
+				F10000000000000000000004 /* Release */,
+			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		F10000000000000000000002 /* Build configuration list for PBXNativeTarget "VolumeMixer" */ = {
 			isa = XCConfigurationList;
-			buildConfigurations = (F10000000000000000000005 /* Debug */, F10000000000000000000006 /* Release */);
+			buildConfigurations = (
+				F10000000000000000000005 /* Debug */,
+				F10000000000000000000006 /* Release */,
+			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
