@@ -60,8 +60,6 @@ struct MixerMenuView: View {
         }
         .frame(width: 290, height: Self.panelHeight(deviceCount: controller.devices.count))
         .clipShape(RoundedRectangle(cornerRadius: 14))
-        // The popover never becomes key (so it doesn't steal focus); render controls as if it were.
-        .environment(\.controlActiveState, .key)
         .alert("Volume Mixer", isPresented: errorIsPresented) {
             Button("OK", role: .cancel) { controller.errorMessage = nil }
         } message: {

@@ -112,7 +112,7 @@ final class StatusBarDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegat
             popover.contentViewController?.view.layoutSubtreeIfNeeded()
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             if let window = popover.contentViewController?.view.window {
-                forceActiveAppearance(in: window)
+                makeKeyWithoutActivating(window)
             }
             controller.setPanelVisible(true)
             refreshTick = 0
@@ -134,17 +134,14 @@ final class StatusBarDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegat
         }
     }
 
-    /// Keeps the popover looking like a focused window without activating the app,
-    /// so the previously frontmost app keeps keyboard focus.
-    private func forceActiveAppearance(in window: NSWindow) {
-        guard let root = window.contentView?.superview ?? window.contentView else { return }
-        var stack: [NSView] = [root]
-        while let view = stack.popLast() {
-            if let effectView = view as? NSVisualEffectView {
-                effectView.state = .active
-            }
-            stack.append(contentsOf: view.subviews)
-        }
+    /// Gives the popover real key status (so its Liquid Glass and controls render as focused)
+    /// without activating the app: the previously frontmost app stays active, keeps its
+    /// menu bar and window appearance, and gets keyboard focus back when the popover closes.
+    /// The glass's focused look is decided by the window server, so it can't be faked.
+    private func makeKeyWithoutActivating(_ window: NSWindow) {
+        guard let panel = window as? NSPanel else { return }
+        panel.styleMask.insert(.nonactivatingPanel)
+        panel.makeKey()
     }
 
     func popoverDidClose(_ notification: Notification) {
