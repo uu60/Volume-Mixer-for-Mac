@@ -70,12 +70,17 @@ final class StatusBarDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegat
             }
     }
 
+    private static let headphoneSymbols: Set<String> = [
+        "headphones", "earbuds", "airpods", "airpodspro", "airpodsmax",
+    ]
+
     private func updateStatusIcon(volume: Double, muted: Bool, device: AudioOutputDevice?) {
         let symbol: String
-        if muted || volume < 0.01 {
+        if let deviceSymbol = device?.symbolName, Self.headphoneSymbols.contains(deviceSymbol) {
+            // Headphones keep their own icon (like the system), even when muted or at 0.
+            symbol = deviceSymbol
+        } else if muted || volume < 0.01 {
             symbol = "speaker.slash.fill"
-        } else if device?.symbolName == "headphones" || device?.symbolName == "earbuds" {
-            symbol = "headphones"
         } else if volume < 0.34 {
             symbol = "speaker.wave.1.fill"
         } else if volume < 0.67 {

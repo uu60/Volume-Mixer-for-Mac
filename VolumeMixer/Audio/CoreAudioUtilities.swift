@@ -178,7 +178,11 @@ enum CoreAudioSystem {
 
     private static func deviceSymbol(transport: UInt32, name: String) -> String {
         let lowerName = name.lowercased()
-        if lowerName.contains("airpods") || lowerName.contains("earbuds") { return "earbuds" }
+        // Older symbol names are used so they exist on macOS 14.
+        if lowerName.contains("airpods max") { return "airpodsmax" }
+        if lowerName.contains("airpods pro") { return "airpodspro" }
+        if lowerName.contains("airpods") { return "airpods" }
+        if lowerName.contains("earbuds") { return "earbuds" }
         if lowerName.contains("headphone") || lowerName.contains("headset") { return "headphones" }
         if lowerName.contains("macbook") || lowerName.contains("imac") { return "laptopcomputer" }
         if lowerName.contains("display") || lowerName.contains("monitor") { return "display" }
