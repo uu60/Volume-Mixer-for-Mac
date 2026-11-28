@@ -40,32 +40,40 @@ void VMGainProcessorProcess(VMGainProcessor *processor,
             continue;
         }
 
-        const UInt32 inputIndex = bufferIndex < input->mNumberBuffers ? bufferIndex : 0;
+        // Round-robin so non-interleaved stereo input (L, R) maps to L, R, L, R... when
+        // the output spans several sub-devices (multi-output devices).
+        const UInt32 inputIndex = bufferIndex % input->mNumberBuffers;
         const AudioBuffer *inBuffer = &input->mBuffers[inputIndex];
         if (inBuffer->mData == NULL) {
             memset(outBuffer->mData, 0, outBuffer->mDataByteSize);
             continue;
         }
 
-        const UInt32 byteCount = outBuffer->mDataByteSize < inBuffer->mDataByteSize
-            ? outBuffer->mDataByteSize : inBuffer->mDataByteSize;
-        const UInt32 sampleCount = byteCount / sizeof(float);
-        const UInt32 channelCount = outBuffer->mNumberChannels > 0
-            ? outBuffer->mNumberChannels : 1;
-        const UInt32 frameCount = sampleCount / channelCount;
+        const UInt32 inChannels = inBuffer->mNumberChannels > 0 ? inBuffer->mNumberChannels : 1;
+        const UInt32 outChannels = outBuffer->mNumberChannels > 0 ? outBuffer->mNumberChannels : 1;
+        const UInt32 inFrames = inBuffer->mDataByteSize / (sizeof(float) * inChannels);
+        const UInt32 outFrames = outBuffer->mDataByteSize / (sizeof(float) * outChannels);
+        const UInt32 frameCount = inFrames < outFrames ? inFrames : outFrames;
         const float *source = (const float *)inBuffer->mData;
         float *destination = (float *)outBuffer->mData;
 
         float bufferGain = current;
         for (UInt32 frame = 0; frame < frameCount; frame++) {
             bufferGain += (target - bufferGain) * smoothing;
-            for (UInt32 channel = 0; channel < channelCount; channel++) {
-                const UInt32 sample = frame * channelCount + channel;
-                destination[sample] = source[sample] * bufferGain;
+            for (UInt32 channel = 0; channel < outChannels; channel++) {
+                // Mono input feeds every channel; extra output channels beyond the input stay silent.
+                float sample = 0;
+                if (channel < inChannels) {
+                    sample = source[frame * inChannels + channel];
+                } else if (inChannels == 1) {
+                    sample = source[frame];
+                }
+                destination[frame * outChannels + channel] = sample * bufferGain;
             }
         }
         if (frameCount > framesProcessed) framesProcessed = frameCount;
 
+        const UInt32 byteCount = frameCount * outChannels * sizeof(float);
         if (outBuffer->mDataByteSize > byteCount) {
             memset((char *)outBuffer->mData + byteCount, 0,
                    outBuffer->mDataByteSize - byteCount);

@@ -18,11 +18,17 @@ final class ProcessTapSession {
         self.processor = processor
 
         do {
-            let description = CATapDescription(
-                processes: [processID],
-                deviceUID: outputDevice.uid,
-                stream: 0
-            )
+            // A multi-output/aggregate output can't be nested in our private aggregate device,
+            // so play through its real sub-devices and tap the process as a stereo mixdown.
+            let subDevices = CoreAudioSystem.playbackSubDevices(for: outputDevice)
+            let description = subDevices == nil
+                ? CATapDescription(processes: [processID], deviceUID: outputDevice.uid, stream: 0)
+                : CATapDescription(stereoMixdownOfProcesses: [processID])
+            let mainUID = subDevices?.mainUID ?? outputDevice.uid
+            let subDeviceList: [[String: Any]] = (subDevices?.uids ?? [outputDevice.uid]).map { uid in
+                [kAudioSubDeviceUIDKey: uid,
+                 kAudioSubDeviceDriftCompensationKey: uid != mainUID]
+            }
             description.name = "Volume Mixer \(processID)"
             description.uuid = UUID()
             description.isPrivate = true
@@ -37,10 +43,8 @@ final class ProcessTapSession {
                 kAudioAggregateDeviceUIDKey: "com.example.VolumeMixer.\(UUID().uuidString)",
                 kAudioAggregateDeviceNameKey: "Volume Mixer Private Device",
                 kAudioAggregateDeviceIsPrivateKey: true,
-                kAudioAggregateDeviceMainSubDeviceKey: outputDevice.uid,
-                kAudioAggregateDeviceSubDeviceListKey: [
-                    [kAudioSubDeviceUIDKey: outputDevice.uid]
-                ],
+                kAudioAggregateDeviceMainSubDeviceKey: mainUID,
+                kAudioAggregateDeviceSubDeviceListKey: subDeviceList,
                 kAudioAggregateDeviceTapListKey: [
                     [kAudioSubTapUIDKey: description.uuid.uuidString]
                 ],

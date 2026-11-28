@@ -162,6 +162,34 @@ enum CoreAudioSystem {
         .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }
 
+    /// The real devices that audio sent to `device` plays through. A multi-output or
+    /// aggregate device is expanded into its active sub-devices, because Core Audio can't
+    /// nest an aggregate device inside the private aggregate device used for a process tap.
+    static func playbackSubDevices(for device: AudioOutputDevice) -> (mainUID: String, uids: [String])? {
+        guard let transport = try? uint32Property(object: device.id, selector: kAudioDevicePropertyTransportType),
+              transport == kAudioDeviceTransportTypeAggregate else { return nil }
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioAggregateDevicePropertyActiveSubDeviceList,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        let subDeviceIDs: [AudioObjectID] = (try? arrayProperty(object: device.id, address: &address)) ?? []
+        let uids = subDeviceIDs.compactMap { id -> String? in
+            var streams = AudioObjectPropertyAddress(
+                mSelector: kAudioDevicePropertyStreams,
+                mScope: kAudioDevicePropertyScopeOutput,
+                mElement: kAudioObjectPropertyElementMain
+            )
+            var size: UInt32 = 0
+            guard AudioObjectGetPropertyDataSize(id, &streams, 0, nil, &size) == noErr, size > 0 else { return nil }
+            return try? stringProperty(object: id, selector: kAudioDevicePropertyDeviceUID)
+        }
+        guard let first = uids.first else { return nil }
+        let main = (try? stringProperty(object: device.id, selector: kAudioAggregateDevicePropertyMainSubDevice))
+            .flatMap { uids.contains($0) ? $0 : nil } ?? first
+        return (main, uids)
+    }
+
     private static func deviceIconURL(_ device: AudioObjectID) -> URL? {
         var address = AudioObjectPropertyAddress(
             mSelector: kAudioDevicePropertyIcon,
